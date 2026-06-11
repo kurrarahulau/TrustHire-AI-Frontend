@@ -1,29 +1,48 @@
 import { useState } from "react";
+import { supabase } from "./supabase";
 
 function Login({ onLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    onLogin({
-      fullName: name,
-      email: email,
-    });
-  };
+  const { error } = await supabase
+    .from("profiles")
+    .insert([
+      {
+        full_name: name,
+        email: email,
+      },
+    ]);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("✅ Successfully signed up with TrustHire AI");
+
+  onLogin({
+    fullName: name,
+    email: email,
+  });
+};
 
   return (
     <section className="glass-card login-card fade-in">
-     <h1 className="title">
-TrustHire AI Job Scam Detector
-</h1>
 
-     <p className="subtitle">
-Protect yourself from fake recruiters and online employment scams using AI-powered verification.
-</p>
+      <h1 className="title">
+        TrustHire AI Job Scam Detector
+      </h1>
+
+      <p className="subtitle">
+        Protect yourself from fake recruiters and online employment scams using AI-powered verification.
+      </p>
 
       <form className="form" onSubmit={handleSubmit}>
+
         <input
           className="input"
           placeholder="Full Name"
@@ -44,14 +63,10 @@ Protect yourself from fake recruiters and online employment scams using AI-power
         <button className="button" type="submit">
           Continue
         </button>
+
       </form>
 
-<div className="footer">
-  © 2026 TrustHire AI
-  <span>AI Powered Job Scam Detection System</span>
-</div>
-
-</section>
+    </section>
   );
 }
 

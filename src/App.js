@@ -1,8 +1,10 @@
+
 import { useState } from "react";
 import Login from "./Login";
 import JobForm from "./JobForm";
 import Loader from "./Loader";
 import Result from "./Result";
+import { supabase } from "./supabase";
 import "./styles.css";
 
 function App() {
@@ -27,15 +29,32 @@ function App() {
 
       const data = await response.json();
 
-      setResult(
+      const aiResult =
         typeof data.result === "string"
           ? JSON.parse(data.result)
-          : data.result
-      );
+          : data.result;
+
+      setResult(aiResult);
+
+      const { error } = await supabase.from("job_analyses").insert([
+        {
+          job_title: formData.job_title,
+          company_name: formData.company_name,
+          trust_score: aiResult.trust_score,
+          risk_level: aiResult.risk_level,
+          reasoning: aiResult.reasoning,
+        },
+      ]);
+
+      if (error) {
+        console.log("Supabase Error:", error);
+      } else {
+        console.log("Analysis saved successfully!");
+      }
 
       setScreen("result");
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
 
       setResult({
         trust_score: 0,
@@ -60,9 +79,10 @@ function App() {
       <div className="backdrop-glow"></div>
 
       <div className="stage">
+
         <footer className="footer">
-  Powered by TrustHire AI • React • FastAPI • OpenRouter AI
-</footer>
+          Powered by TrustHire AI • React • FastAPI • OpenRouter AI • Supabase
+        </footer>
 
         {screen === "login" && (
           <Login onLogin={handleLogin} />
