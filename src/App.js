@@ -19,7 +19,7 @@ function App() {
     setScreen("loading");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/analyze", {
+      const response = await fetch("https://trusthire-backend-2zty.onrender.com/api/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,10 +29,14 @@ function App() {
 
       const data = await response.json();
 
-      const aiResult =
-        typeof data.result === "string"
-          ? JSON.parse(data.result)
-          : data.result;
+console.log("BACKEND RESPONSE:", data);
+
+const aiResult =
+  typeof data.result === "string"
+    ? JSON.parse(data.result)
+    : data.result;
+
+console.log("AI RESULT:", aiResult);
 
       setResult(aiResult);
 
